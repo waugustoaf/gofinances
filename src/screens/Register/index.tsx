@@ -32,7 +32,9 @@ const formSchema = Yup.object().shape({
 });
 
 export const Register = () => {
-  const [transactionType, setTransactionType] = useState('');
+  const [transactionType, setTransactionType] = useState<'' | 'up' | 'down'>(
+    '',
+  );
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [category, setCategory] = useState<ICategoryDTO>({
     color: '#fff',
@@ -45,6 +47,7 @@ export const Register = () => {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(formSchema),
   });
@@ -72,6 +75,15 @@ export const Register = () => {
     const dataObject = { ...data, transactionType, category: category.key };
 
     console.log(dataObject);
+
+    setCategory({
+      color: '#fff',
+      icon: 'any',
+      key: 'category',
+      name: 'Categoria',
+    });
+    setTransactionType('');
+    reset();
   };
 
   return (

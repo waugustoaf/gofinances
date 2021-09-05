@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/Forms/Button';
 import { ICategoryDTO } from '../../dtos/ICategoryDTO';
 import { categories } from '../../utils/categories';
 import {
@@ -12,6 +11,8 @@ import {
   Name,
   Separator,
   Footer,
+  Button,
+  ButtonText,
 } from './styles';
 
 interface CategorySelectProps {
@@ -58,7 +59,9 @@ export const CategorySelect = ({
       />
 
       <Footer>
-        <Button title='Selecionar' onPress={handleReturn} />
+        <Button onPress={handleReturn}>
+          <ButtonText>Selecionar</ButtonText>
+        </Button>
       </Footer>
     </Container>
   );

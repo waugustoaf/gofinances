@@ -7,6 +7,7 @@ import {
   getStatusBarHeight,
 } from 'react-native-iphone-x-helper';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
+import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
 
 export const Container = styled.View`
   flex: 1;
@@ -23,6 +24,10 @@ export const Header = styled.View`
 export const Icon = styled(Feather)`
   font-size: ${RFValue(24)}px;
   color: ${props => props.theme.colors.secondary};
+`;
+
+export const LogoutButton = styled(BorderlessButton)`
+  border-radius: ${RFValue(12)}px;
 `;
 
 export const UserWrapper = styled.View`

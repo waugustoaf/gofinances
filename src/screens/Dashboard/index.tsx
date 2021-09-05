@@ -1,5 +1,4 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard } from '../../components/TransactionCard';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
@@ -17,6 +16,7 @@ import {
   UserInfo,
   UserName,
   UserWrapper,
+  LogoutButton,
 } from './styles';
 
 export const Dashboard = () => {
@@ -58,9 +58,9 @@ export const Dashboard = () => {
               <UserName>Walther</UserName>
             </User>
           </UserInfo>
-          <TouchableOpacity activeOpacity={0.7}>
+          <LogoutButton activeOpacity={0.7}>
             <Icon name='power' />
-          </TouchableOpacity>
+          </LogoutButton>
         </UserWrapper>
       </Header>
 

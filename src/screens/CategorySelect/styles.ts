@@ -1,8 +1,9 @@
+import { Feather } from '@expo/vector-icons';
 import { FlatList } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
 import { RFValue } from 'react-native-responsive-fontsize';
 import styled from 'styled-components/native';
 import { ICategoryDTO } from '../../dtos/ICategoryDTO';
-import { Feather } from '@expo/vector-icons';
 
 interface CategoryProps {
   isActive: boolean;
@@ -65,4 +66,24 @@ export const Separator = styled.View`
 export const Footer = styled.View`
   width: 100%;
   padding: 24px;
+`;
+
+export const Button = styled.TouchableOpacity.attrs({
+  activeOpacity: 0.8,
+})`
+  width: 100%;
+  background-color: ${props => props.theme.colors.secondary};
+
+  padding: 18px;
+  border-radius: 5px;
+
+  align-items: center;
+  justify-content: center;
+`;
+
+export const ButtonText = styled.Text`
+  font-size: ${RFValue(14)}px;
+  font-family: ${props => props.theme.fonts.medium};
+
+  color: ${props => props.theme.colors.shape};
 `;

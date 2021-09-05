@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacityProps } from 'react-native';
+import { RectButton } from 'react-native-gesture-handler';
 import { Container, Category, Icon } from './styles';
 
-type CategorySelectProps = Omit<TouchableOpacityProps, 'activeOpacity'> & {
+type CategorySelectProps = RectButton & {
   title: string;
 };
 
