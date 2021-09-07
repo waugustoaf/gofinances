@@ -1,14 +1,18 @@
+import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Alert, Keyboard, Modal, TouchableWithoutFeedback } from 'react-native';
+import uuid from 'react-native-uuid';
+import * as Yup from 'yup';
 import { Button } from '../../components/Forms/Button';
 import { CategorySelectButton } from '../../components/Forms/CategorySelectButton';
 import { InputForm } from '../../components/Forms/InputForm';
 import { TransactionTypeButton } from '../../components/Forms/TransactionTypeButton';
 import { ICategoryDTO } from '../../dtos/ICategoryDTO';
+import { ITransactionDTO } from '../../dtos/ITransactionDTO';
 import { CategorySelect } from '../CategorySelect';
-import { useForm } from 'react-hook-form';
-import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Container,
   Fields,
@@ -43,6 +47,9 @@ export const Register = () => {
     name: 'Categoria',
   });
 
+  const dataKey = '@gofinances:transactions';
+  const navigation = useNavigation();
+
   const {
     control,
     handleSubmit,
@@ -60,7 +67,7 @@ export const Register = () => {
     setCategoryModalOpen(prevState => !prevState);
   };
 
-  const handleRegister = (data: FormData) => {
+  const handleRegister = async (data: FormData) => {
     if (!transactionType)
       return Alert.alert(
         'Preencha todos os campos',
@@ -72,9 +79,29 @@ export const Register = () => {
         'Parece que você esqueceu de escolher a categoria',
       );
 
-    const dataObject = { ...data, transactionType, category: category.key };
+    const newTransaction: ITransactionDTO = {
+      category_key: category.key,
+      date: new Date().toString(),
+      title: data.name,
+      amount: Number(data.amount),
+      type: transactionType === 'down' ? 'negative' : 'positive',
+      id: String(uuid.v4()),
+    };
 
-    console.log(dataObject);
+    try {
+      const oldData = await AsyncStorage.getItem(dataKey);
+      const oldTransactions: ITransactionDTO[] = JSON.parse(oldData) || [];
+      const newTransactions = [...oldTransactions, newTransaction];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(newTransactions));
+    } catch (err) {
+      console.log(err);
+      Alert.alert(
+        'Não foi possível salvar',
+        'Houve um erro ao salvar sua transação.',
+      );
+      return;
+    }
 
     setCategory({
       color: '#fff',
@@ -84,6 +111,8 @@ export const Register = () => {
     });
     setTransactionType('');
     reset();
+
+    navigation.navigate('Dashboard');
   };
 
   return (

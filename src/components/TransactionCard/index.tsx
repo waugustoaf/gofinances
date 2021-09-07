@@ -13,13 +13,13 @@ import {
 
 interface Data extends ITransactionDTO {}
 
-interface Props {
+interface TransactionCardProps {
   data: Data;
 }
 
 export const TransactionCard = ({
   data: { amount, category, date, title, type },
-}: Props) => {
+}: TransactionCardProps) => {
   return (
     <Container>
       <Title>{title}</Title>

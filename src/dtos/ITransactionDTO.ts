@@ -7,7 +7,8 @@ export interface ITransactionDTO {
   id?: string;
   type: 'negative' | 'positive';
   title: string;
-  amount: string;
-  category: Category;
+  amount: number | string;
+  category?: Category;
+  category_key: string;
   date: string;
 }
