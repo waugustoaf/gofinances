@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/core';
 import React, { useState, useCallback, useMemo } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { useTheme } from 'styled-components';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard } from '../../components/TransactionCard';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
@@ -10,6 +12,7 @@ import {
   Header,
   HighlightCards,
   Icon,
+  LoadingView,
   LogoutButton,
   Photo,
   Title,
@@ -22,19 +25,35 @@ import {
   UserWrapper,
 } from './styles';
 
+interface CardItemProps {
+  amount: string;
+  lastTransaction: string;
+}
 interface CardProps {
-  entries: string;
-  expensive: string;
-  total: string;
+  entries: CardItemProps;
+  expensive: CardItemProps;
+  total: CardItemProps;
 }
 
 export const Dashboard = () => {
   const [transactions, setTransaction] = useState<ITransactionDTO[]>([]);
   const [cardsProps, setCardsProps] = useState<CardProps>({
-    entries: 'R$ 0,00',
-    expensive: 'R$ 0,00',
-    total: 'R$ 0,00',
+    entries: {
+      amount: 'R$ 0,00',
+      lastTransaction: '',
+    },
+    expensive: {
+      amount: 'R$ 0,00',
+      lastTransaction: '',
+    },
+    total: {
+      amount: 'R$ 0,00',
+      lastTransaction: '',
+    },
   });
+  const [loading, setLoading] = useState(true);
+
+  const theme = useTheme();
 
   const formatCurrency = useCallback((value: number) => {
     return Number(value).toLocaleString('pt-BR', {
@@ -43,7 +62,28 @@ export const Dashboard = () => {
     });
   }, []);
 
-  const loadTransactions = useCallback(async () => {
+  const getLastLastTransactionDate = (
+    collection: ITransactionDTO[],
+    type: 'positive' | 'negative',
+  ) => {
+    const lastTransactionDate = new Date(
+      Math.max.apply(
+        Math,
+        collection
+          .filter(transaction => transaction.type === type)
+          .map(transaction => new Date(transaction.date).getTime()),
+      ),
+    );
+
+    return `${String(lastTransactionDate.getDate()).padStart(
+      2,
+      '0',
+    )} de ${lastTransactionDate.toLocaleString('pt-BR', {
+      month: 'long',
+    })}`;
+  };
+
+  const loadTransactions = async () => {
     const data = await AsyncStorage.getItem('@gofinances:transactions');
     const typedDate: ITransactionDTO[] = JSON.parse(data) || [];
     const formattedData = typedDate.map(transaction => {
@@ -83,23 +123,53 @@ export const Dashboard = () => {
 
     const totalValue = entriesValue - expensiveValue;
 
-    setCardsProps({
-      entries: formatCurrency(entriesValue),
+    const stringValues = {
+      entry: formatCurrency(entriesValue),
       expensive: formatCurrency(expensiveValue),
-      total:
-        totalValue < 0
-          ? `- ${formatCurrency(totalValue)}`
-          : formatCurrency(totalValue),
+      total: formatCurrency(totalValue),
+    };
+
+    const lastTransactionsEntry = getLastLastTransactionDate(
+      typedDate,
+      'positive',
+    );
+    const lastTransactionsExpensive = getLastLastTransactionDate(
+      typedDate,
+      'positive',
+    );
+    const totalInterval = `01 a ${lastTransactionsExpensive}`;
+
+    setCardsProps({
+      entries: {
+        amount: stringValues.entry,
+        lastTransaction: lastTransactionsEntry,
+      },
+      expensive: {
+        amount: stringValues.expensive,
+        lastTransaction: lastTransactionsExpensive,
+      },
+      total: {
+        amount: totalValue < 0 ? `- ${stringValues.total}` : stringValues.total,
+        lastTransaction: totalInterval,
+      },
     });
-
     setTransaction(formattedData);
-  }, []);
+    setLoading(false);
+  };
 
-  useFocusEffect(() => {
-    (async () => {
-      await loadTransactions();
-    })();
-  });
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactions();
+    }, []),
+  );
+
+  if (loading) {
+    return (
+      <LoadingView>
+        <ActivityIndicator color={theme.colors.primary} size='large' />
+      </LoadingView>
+    );
+  }
 
   return (
     <Container>
@@ -122,20 +192,20 @@ export const Dashboard = () => {
         <HighlightCard
           type='up'
           title='Entradas'
-          amount={cardsProps.entries}
-          lastTransaction='Última entrada dia 13 de abril'
+          amount={cardsProps.entries.amount}
+          lastTransaction={`Última entrada dia ${cardsProps.entries.lastTransaction}`}
         />
         <HighlightCard
           type='down'
           title='Saídas'
-          amount={cardsProps.expensive}
-          lastTransaction='Última entrada dia 03 de abril'
+          amount={cardsProps.expensive.amount}
+          lastTransaction={`Última saída dia ${cardsProps.expensive.lastTransaction}`}
         />
         <HighlightCard
           type='total'
           title='Total'
-          amount={cardsProps.total}
-          lastTransaction='01 a 16 de abril'
+          amount={cardsProps.total.amount}
+          lastTransaction={`${cardsProps.total.lastTransaction}`}
         />
       </HighlightCards>
 

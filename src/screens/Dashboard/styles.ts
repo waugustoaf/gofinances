@@ -7,7 +7,13 @@ import {
   getStatusBarHeight,
 } from 'react-native-iphone-x-helper';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
-import { BorderlessButton, RectButton } from 'react-native-gesture-handler';
+import { BorderlessButton } from 'react-native-gesture-handler';
+
+export const LoadingView = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const Container = styled.View`
   flex: 1;

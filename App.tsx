@@ -1,16 +1,16 @@
-import 'react-native-gesture-handler';
-import 'intl';
-import 'intl/locale-data/jsonp/pt-BR';
 import {
   Poppins_400Regular,
   Poppins_500Medium,
   Poppins_700Bold,
   useFonts,
 } from '@expo-google-fonts/poppins';
-import AppLoading from 'expo-app-loading';
-import React from 'react';
-import { CustomThemeProvider } from './src/global/styles/theme';
 import { NavigationContainer } from '@react-navigation/native';
+import AppLoading from 'expo-app-loading';
+import 'intl';
+import 'intl/locale-data/jsonp/pt-BR';
+import React from 'react';
+import 'react-native-gesture-handler';
+import { CustomThemeProvider } from './src/global/styles/theme';
 import { AppRoutes } from './src/routes/app.routes';
 
 export default function App() {
