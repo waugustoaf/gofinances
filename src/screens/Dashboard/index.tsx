@@ -149,7 +149,7 @@ export const Dashboard = () => {
         lastTransaction: lastTransactionsExpensive,
       },
       total: {
-        amount: totalValue < 0 ? `- ${stringValues.total}` : stringValues.total,
+        amount: stringValues.total,
         lastTransaction: totalInterval,
       },
     });

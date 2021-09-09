@@ -9,8 +9,9 @@ import AppLoading from 'expo-app-loading';
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
 import React from 'react';
+import { StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
-import { CustomThemeProvider } from './src/global/styles/theme';
+import { CustomThemeProvider, theme } from './src/global/styles/theme';
 import { AppRoutes } from './src/routes/app.routes';
 
 export default function App() {
@@ -27,6 +28,10 @@ export default function App() {
   return (
     <CustomThemeProvider>
       <NavigationContainer>
+        <StatusBar
+          barStyle='light-content'
+          backgroundColor={theme.colors.primary}
+        />
         <AppRoutes />
       </NavigationContainer>
     </CustomThemeProvider>

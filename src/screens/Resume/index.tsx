@@ -1,22 +1,31 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/core';
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useTheme } from 'styled-components';
+import { VictoryPie } from 'victory-native';
 import { HistoryCard } from '../../components/HistoryCard';
 import { ICategoryDTO } from '../../dtos/ICategoryDTO';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
 import { categories } from '../../utils/categories';
-import { VictoryPie } from 'victory-native';
+import { addMonths, subMonths, format } from 'date-fns';
 import {
+  ChartContainer,
   Container,
-  Header,
   Content,
+  Header,
+  LoadingView,
   Title,
   Warning,
   WarningText,
-  ChartContainer,
+  MonthSelect,
+  MonthSelectButton,
+  MonthSelectIcon,
+  Month,
+  WarningView,
 } from './styles';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { useTheme } from 'styled-components';
+import { ptBR } from 'date-fns/locale';
 
 interface ICategoryWithSum extends ICategoryDTO {
   total: number;
@@ -26,11 +35,21 @@ interface ICategoryWithSum extends ICategoryDTO {
 }
 
 export const Resume = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [categoriesWithSum, setCategoriesWithSum] = useState<
     ICategoryWithSum[]
   >([]);
+  const [loading, setLoading] = useState(true);
 
   const theme = useTheme();
+
+  const handleChangeDate = (action: 'next' | 'previous') => {
+    if (action === 'next') {
+      setSelectedDate(prevState => addMonths(prevState, 1));
+    } else {
+      setSelectedDate(prevState => subMonths(prevState, 1));
+    }
+  };
 
   const loadData = async () => {
     const dataKey = '@gofinances:transactions';
@@ -38,7 +57,10 @@ export const Resume = () => {
     const formattedTransaction: ITransactionDTO[] = JSON.parse(data) || [];
 
     const expensiveTransactions = formattedTransaction.filter(
-      transaction => transaction.type === 'negative',
+      transaction =>
+        transaction.type === 'negative' &&
+        new Date(transaction.date).getMonth() === selectedDate.getMonth() &&
+        new Date(transaction.date).getFullYear() === selectedDate.getFullYear(),
     );
 
     const expensiveTotal = expensiveTransactions.reduce(
@@ -85,11 +107,16 @@ export const Resume = () => {
     });
 
     setCategoriesWithSum(totalByCategory);
+    setLoading(false);
   };
+
+  useEffect(() => {
+    loadData();
+  }, [selectedDate]);
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
+      setSelectedDate(new Date());
     }, []),
   );
 
@@ -103,6 +130,14 @@ export const Resume = () => {
     };
   }, [categoriesWithSum]);
 
+  if (loading) {
+    return (
+      <LoadingView>
+        <ActivityIndicator size='large' color={theme.colors.primary} />
+      </LoadingView>
+    );
+  }
+
   return (
     <Container>
       <Header>
@@ -111,6 +146,19 @@ export const Resume = () => {
 
       {categoriesWithSum.length !== 0 ? (
         <Content>
+          <MonthSelect>
+            <MonthSelectButton onPress={() => handleChangeDate('previous')}>
+              <MonthSelectIcon name='chevron-left' />
+            </MonthSelectButton>
+            <Month>
+              {format(selectedDate, 'MMMM, yyyy', {
+                locale: ptBR,
+              })}
+            </Month>
+            <MonthSelectButton onPress={() => handleChangeDate('next')}>
+              <MonthSelectIcon name='chevron-right' />
+            </MonthSelectButton>
+          </MonthSelect>
           <ChartContainer>
             <VictoryPie
               data={chartProps.values}
@@ -137,7 +185,23 @@ export const Resume = () => {
         </Content>
       ) : (
         <Warning>
-          <WarningText>Nenhuma transação cadastrada</WarningText>
+          <MonthSelect>
+            <MonthSelectButton onPress={() => handleChangeDate('previous')}>
+              <MonthSelectIcon name='chevron-left' />
+            </MonthSelectButton>
+            <Month>
+              {format(selectedDate, 'MMMM, yyyy', {
+                locale: ptBR,
+              })}
+            </Month>
+            <MonthSelectButton onPress={() => handleChangeDate('next')}>
+              <MonthSelectIcon name='chevron-right' />
+            </MonthSelectButton>
+          </MonthSelect>
+
+          <WarningView>
+            <WarningText>Nenhuma transação cadastrada</WarningText>
+          </WarningView>
         </Warning>
       )}
     </Container>
