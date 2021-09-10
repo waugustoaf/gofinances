@@ -6,7 +6,9 @@ import { useTheme } from 'styled-components';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard } from '../../components/TransactionCard';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
+import { useAuth } from '../../hooks/auth';
 import { categories } from '../../utils/categories';
+import pictureImg from '../../assets/profile.png';
 import {
   Container,
   Header,
@@ -54,6 +56,7 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const theme = useTheme();
+  const { user, signOut } = useAuth();
 
   const formatCurrency = useCallback((value: number) => {
     return Number(value).toLocaleString('pt-BR', {
@@ -176,13 +179,19 @@ export const Dashboard = () => {
       <Header>
         <UserWrapper>
           <UserInfo>
-            <Photo source={{ uri: 'https://github.com/waugustoaf.png' }} />
+            <Photo
+              source={{
+                uri: user.photo
+                  ? user.photo
+                  : `https://ui-avatars.com/api/?name=${user.name}`,
+              }}
+            />
             <User>
               <UserGreeting>Olá,</UserGreeting>
-              <UserName>Walther</UserName>
+              <UserName>{user.name.split(' ')[0]}</UserName>
             </User>
           </UserInfo>
-          <LogoutButton activeOpacity={0.7}>
+          <LogoutButton activeOpacity={0.7} onPress={signOut}>
             <Icon name='power' />
           </LogoutButton>
         </UserWrapper>

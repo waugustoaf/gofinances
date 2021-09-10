@@ -12,7 +12,10 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
 import { CustomThemeProvider, theme } from './src/global/styles/theme';
+import { HooksProvider } from './src/hooks';
+import { Routes } from './src/routes';
 import { AppRoutes } from './src/routes/app.routes';
+import { SignIn } from './src/screens/SignIn';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -27,13 +30,13 @@ export default function App() {
 
   return (
     <CustomThemeProvider>
-      <NavigationContainer>
+      <HooksProvider>
         <StatusBar
           barStyle='light-content'
           backgroundColor={theme.colors.primary}
         />
-        <AppRoutes />
-      </NavigationContainer>
+        <Routes />
+      </HooksProvider>
     </CustomThemeProvider>
   );
 }

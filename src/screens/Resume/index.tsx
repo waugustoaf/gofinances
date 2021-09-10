@@ -200,7 +200,9 @@ export const Resume = () => {
           </MonthSelect>
 
           <WarningView>
-            <WarningText>Nenhuma transação cadastrada</WarningText>
+            <WarningText>
+              Nenhuma transação cadastrada para esse período
+            </WarningText>
           </WarningView>
         </Warning>
       )}

@@ -59,6 +59,8 @@ export const Photo = styled.Image`
   height: ${RFValue(48)}px;
 
   border-radius: 10px;
+
+  background-color: ${props => props.theme.colors.secondary};
 `;
 
 export const User = styled.View`

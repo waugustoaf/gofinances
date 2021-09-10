@@ -51,11 +51,13 @@ export const WarningView = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
 `;
 
 export const WarningText = styled.Text`
   font-family: ${props => props.theme.fonts.medium};
   font-size: ${RFValue(16)}px;
+  text-align: center;
 `;
 
 export const LoadingView = styled.View`
