@@ -65,16 +65,24 @@ export const Dashboard = () => {
     });
   }, []);
 
-  const getLastLastTransactionDate = (
+  const getLastTransactionDate = (
     collection: ITransactionDTO[],
     type: 'positive' | 'negative',
   ) => {
+    const collectionFiltered = collection.filter(
+      transaction => transaction.type === type,
+    );
+
+    if (collectionFiltered.length === 0) {
+      return '';
+    }
+
     const lastTransactionDate = new Date(
       Math.max.apply(
         Math,
-        collection
-          .filter(transaction => transaction.type === type)
-          .map(transaction => new Date(transaction.date).getTime()),
+        collectionFiltered.map(transaction =>
+          new Date(transaction.date).getTime(),
+        ),
       ),
     );
 
@@ -87,7 +95,9 @@ export const Dashboard = () => {
   };
 
   const loadTransactions = async () => {
-    const data = await AsyncStorage.getItem('@gofinances:transactions');
+    const data = await AsyncStorage.getItem(
+      `@gofinances:transactions_user:${user.id}`,
+    );
     const typedDate: ITransactionDTO[] = JSON.parse(data) || [];
     const formattedData = typedDate.map(transaction => {
       const amount = formatCurrency(Number(transaction.amount));
@@ -132,15 +142,15 @@ export const Dashboard = () => {
       total: formatCurrency(totalValue),
     };
 
-    const lastTransactionsEntry = getLastLastTransactionDate(
+    const lastTransactionsEntry = getLastTransactionDate(typedDate, 'positive');
+    const lastTransactionsExpensive = getLastTransactionDate(
       typedDate,
-      'positive',
+      'negative',
     );
-    const lastTransactionsExpensive = getLastLastTransactionDate(
-      typedDate,
-      'positive',
-    );
-    const totalInterval = `01 a ${lastTransactionsExpensive}`;
+    const totalInterval =
+      lastTransactionsEntry === '' && lastTransactionsExpensive === ''
+        ? 'Nenhuma transação cadastrada'
+        : `01 a ${lastTransactionsExpensive || lastTransactionsEntry}`;
 
     setCardsProps({
       entries: {
@@ -183,7 +193,7 @@ export const Dashboard = () => {
               source={{
                 uri: user.photo
                   ? user.photo
-                  : `https://ui-avatars.com/api/?name=${user.name}`,
+                  : `https://ui-avatars.com/api/?name=${user.name}&length=1`,
               }}
             />
             <User>
@@ -202,13 +212,21 @@ export const Dashboard = () => {
           type='up'
           title='Entradas'
           amount={cardsProps.entries.amount}
-          lastTransaction={`Última entrada dia ${cardsProps.entries.lastTransaction}`}
+          lastTransaction={
+            cardsProps.entries.lastTransaction === ''
+              ? 'Nenhuma entrada cadastrada'
+              : `Última entrada dia ${cardsProps.entries.lastTransaction}`
+          }
         />
         <HighlightCard
           type='down'
           title='Saídas'
           amount={cardsProps.expensive.amount}
-          lastTransaction={`Última saída dia ${cardsProps.expensive.lastTransaction}`}
+          lastTransaction={
+            cardsProps.expensive.lastTransaction === ''
+              ? 'Nenhuma entrada cadastrada'
+              : `Última saída dia ${cardsProps.expensive.lastTransaction}`
+          }
         />
         <HighlightCard
           type='total'

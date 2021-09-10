@@ -3,6 +3,7 @@ import { IUserDTO } from '../dtos/IUserDTO';
 import * as Google from 'expo-google-app-auth';
 import * as Apple from 'expo-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { tokens } from '../../tokens';
 
 interface AuthContextProps {
   user: IUserDTO;
@@ -31,10 +32,8 @@ export const AuthProvider: React.FC = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const result = await Google.logInAsync({
-        iosClientId:
-          '229580808363-jsp106d1evghvgs9vhi4bbddsulg9ml5.apps.googleusercontent.com',
-        androidClientId:
-          '229580808363-v6kt8bgg71ddoc80mjpt2i6cuhhlgu5n.apps.googleusercontent.com',
+        iosClientId: tokens.IOSTokenId,
+        androidClientId: tokens.GoogleTokenId,
         scopes: ['email', 'profile'],
       });
 

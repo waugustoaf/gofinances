@@ -26,6 +26,7 @@ import {
   WarningView,
 } from './styles';
 import { ptBR } from 'date-fns/locale';
+import { useAuth } from '../../hooks/auth';
 
 interface ICategoryWithSum extends ICategoryDTO {
   total: number;
@@ -42,6 +43,7 @@ export const Resume = () => {
   const [loading, setLoading] = useState(true);
 
   const theme = useTheme();
+  const { user } = useAuth();
 
   const handleChangeDate = (action: 'next' | 'previous') => {
     if (action === 'next') {
@@ -52,7 +54,7 @@ export const Resume = () => {
   };
 
   const loadData = async () => {
-    const dataKey = '@gofinances:transactions';
+    const dataKey = `@gofinances:transactions_user:${user.id}`;
     const data = await AsyncStorage.getItem(dataKey);
     const formattedTransaction: ITransactionDTO[] = JSON.parse(data) || [];
 
@@ -201,7 +203,7 @@ export const Resume = () => {
 
           <WarningView>
             <WarningText>
-              Nenhuma transação cadastrada para esse período
+              Nenhuma transação de saída cadastrada para esse período
             </WarningText>
           </WarningView>
         </Warning>

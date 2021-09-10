@@ -12,6 +12,7 @@ import { InputForm } from '../../components/Forms/InputForm';
 import { TransactionTypeButton } from '../../components/Forms/TransactionTypeButton';
 import { ICategoryDTO } from '../../dtos/ICategoryDTO';
 import { ITransactionDTO } from '../../dtos/ITransactionDTO';
+import { useAuth } from '../../hooks/auth';
 import { CategorySelect } from '../CategorySelect';
 import {
   Container,
@@ -47,7 +48,9 @@ export const Register = () => {
     name: 'Categoria',
   });
 
-  const dataKey = '@gofinances:transactions';
+  const { user } = useAuth();
+
+  const dataKey = `@gofinances:transactions_user:${user.id}`;
   const navigation = useNavigation();
 
   const {
